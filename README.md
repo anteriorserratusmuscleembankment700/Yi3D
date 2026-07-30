@@ -4,6 +4,8 @@
 
 Yi3D is a simple and easy-to-use **open-source** 3D modeling application, available on Windows and Linux.
 
+ [wangyaosoft.com](https://www.wangyaosoft.com)
+
 - **Sketch-based parametric modeling** — create extrusion, revolution, sweep, and loft features from 2D sketches.
 - **Primitive-based Boolean modeling** — combine built-in shapes such as box, cylinder, and sphere with union, difference, and intersection operations.
 
