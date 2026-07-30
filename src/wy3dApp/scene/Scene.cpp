@@ -157,8 +157,6 @@ osg::ref_ptr<osg::Group> Scene::newWCS()
         wcs->getOrCreateStateSet()->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
         // 关闭深度测试
         wcs->getOrCreateStateSet()->setMode(GL_DEPTH_TEST, osg::StateAttribute::OFF);
-        // 后绘制
-        wcs->getOrCreateStateSet()->setRenderBinDetails(RenderBinNumers::WCS, "RenderBin");
     }
 
     // 正向X,Y,Z轴
