@@ -1,0 +1,27 @@
+WY3D
+0 16
+ELEMENTS
+21
+wy3d::DatumPlane 1001 0 0 0 0 0 0 1 1 0 0 TOP #
+wy3d::DatumPlane 1002 0 0 0 0 1 0 0 0 1 0 RIGHT #
+wy3d::DatumPlane 1003 0 0 0 0 -0 -1 -0 1 0 0 FRONT #
+wy3d::Sketch 1005 0 1007 0 0 0 0 0 1 1 0 0 1 1006 #
+wy3d::SketchCircle 1006 0 1005 0 0 0 50 #
+wy3d::Extrusion 1007 0 0 0 4 1010 1014 1022 1027 140 153 165 1005 25 0 #
+wy3d::Sketch 1008 0 1010 0 0 25 0 0 1 1 0 -0 1 1009 #
+wy3d::SketchCircle 1009 0 1008 0 0 0 22.5 #
+wy3d::Extrusion 1010 0 0 1007 0 140 153 165 1008 45 0 #
+wy3d::Sketch 1011 0 1014 0 0 70 0 0 1 1 0 -0 1 1012 #
+wy3d::SketchCircle 1012 0 1011 0 0 0 10 #
+wy3d::Extrusion 1014 0 1 1007 0 140 153 165 1011 -132.783030019 0 #
+wy3d::Sketch 1015 0 1022 0 0 25 0 0 1 1 0 -0 6 1016 1017 1018 1019 1020 1021 #
+wy3d::SketchCircle 1016 0 1015 0 0 40 5 #
+wy3d::SketchCircle 1017 0 1015 0 -34.6410161514 20 5 #
+wy3d::SketchCircle 1018 0 1015 0 -34.6410161514 -20 5 #
+wy3d::SketchCircle 1019 0 1015 0 -4.89858719659e-15 -40 5 #
+wy3d::SketchCircle 1020 0 1015 0 34.6410161514 -20 5 #
+wy3d::SketchCircle 1021 0 1015 0 34.6410161514 20 5 #
+wy3d::Extrusion 1022 0 1 1007 0 140 153 165 1015 -69.1243740203 0 #
+wy3d::Fillet 1027 0 1007 1 v1:@1009@1010 0 2 #
+ENDELEMS
+EOF

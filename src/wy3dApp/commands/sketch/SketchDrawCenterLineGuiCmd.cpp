@@ -1,0 +1,534 @@
+///////////////////////////////////////////////////////////////////////////////
+//
+// Copyright (C) 2024-2026 Wang Yao <wangyao1052@163.com>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+///////////////////////////////////////////////////////////////////////////////
+
+#include "SketchDrawCenterLineGuiCmd.h"
+
+#include <QCoreApplication>
+#include <QCursor>
+#include <QString>
+#include <cmath>
+
+#include <wyVector2.h>
+#include <wydbDatabase.h>
+#include <wydbTransaction.h>
+#include <wyapSelManager.h>
+#include <wy3dImpl.h>
+#include <wy3dSketch.h>
+#include <wy3dSketchLine.h>
+
+#include "application/Application.h"
+#include "commands/sketch/dialogs/GuiCmdHoverInputPopup.h"
+#include "snap/SketchSnapSystem.h"
+#include "widgets/frame/MainWindow.h"
+#include "utils/MathUtils.h"
+
+static bool parseDoubleText(const QString& text, double& value)
+{
+    bool ok(false);
+    value = text.trimmed().toDouble(&ok);
+    return ok;
+}
+
+
+SketchDrawCenterLineGuiCmd::SketchDrawCenterLineGuiCmd() 
+    : OsgGuiCommand(), _step(Step::Undefined), _startPnt(), _endPnt(),
+    _pXYPopup(nullptr), _pLengthAnglePopup(nullptr), _hoverPopupState()
+{
+    _options.pointSelect = false;
+    _options.boxSelect = false;
+}
+
+SketchDrawCenterLineGuiCmd::~SketchDrawCenterLineGuiCmd()
+{
+}
+
+wyap::CmdExecution::StartResult SketchDrawCenterLineGuiCmd::onStart()
+{
+    wyap::CmdExecution::StartResult ret = GuiCommand::onStart();
+    assert(wyap::CmdExecution::StartResult::Succeeded == ret);
+ 
+    _sketchInfo = GuiCommandUtil::initSketchInfo();
+    if (_sketchInfo.pSketchSnapSys) _sketchInfo.pSketchSnapSys->clearSnapResult();
+
+    // 清空选择集
+    Application::instance().getSelManager()->beginChange();
+    Application::instance().getSelManager()->clearSelections();
+    Application::instance().getSelManager()->endChange();
+
+    // 初始化
+    this->gotoStep(Step::SpecifyStartPnt);
+
+    // 鼠标样式
+    Application::instance().setCursor(CursorType::Locate);
+
+    return wyap::CmdExecution::StartResult::Succeeded;
+}
+
+void SketchDrawCenterLineGuiCmd::reset()
+{
+    this->cleanup();
+    this->gotoStep(Step::SpecifyStartPnt);
+}
+
+void SketchDrawCenterLineGuiCmd::cleanup()
+{
+    this->hidePopup();
+
+    _step = Step::Undefined;
+    _startPnt.set(0.0, 0.0);
+    _endPnt.set(0.0, 0.0);
+    _pSnapContext = nullptr;
+    _hoverPopupState.resetValue();
+    _pMakeSketchLine = nullptr;
+}
+
+void SketchDrawCenterLineGuiCmd::onEscapeKey()
+{
+    this->hidePopup();
+
+    if (_step == Step::SpecifyStartPnt || _step == Step::Undefined)
+    {
+        this->requestAbort(AbortCause::UserCancel);
+    }
+    else
+    {
+        this->reset();
+        this->simulateMouseMoveFromPopup();
+    }
+}
+
+bool SketchDrawCenterLineGuiCmd::finishStep(Step step)
+{
+    switch (step)
+    {
+    case Step::SpecifyStartPnt:
+    {
+        wydb::Database* pDb = Application::instance().getActiveDatabase();
+        if (pDb)
+        {
+            _pMakeSketchLine = std::make_shared<MakeSketchCenterLine>(this);
+            if (!_pMakeSketchLine->init(_startPnt, _sketchInfo.sketchId))
+            {
+                _pMakeSketchLine = nullptr;
+                return false;
+            }
+        }
+        else
+        {
+            this->reset();
+            return false;
+        }
+
+        // next step
+        this->gotoStep(Step::SpecifyEndPnt);
+        return true;
+    }
+    break;
+
+    case Step::SpecifyEndPnt:
+    {
+        if (_pMakeSketchLine)
+        {
+            if (!_pMakeSketchLine->update(_endPnt))
+            {
+                return false;
+            }
+            _pMakeSketchLine->commit();
+            _pMakeSketchLine = nullptr;
+        }
+
+        // next step
+        this->gotoStep(Step::SpecifyStartPnt);
+        return true;
+    }
+    break;
+
+    default:
+    {
+        assert(false);
+    }
+    break;
+    }
+
+    return false;
+}
+
+void SketchDrawCenterLineGuiCmd::gotoStep(Step step)
+{
+    _step = step;
+    this->hidePopup();
+    _hoverPopupState.resetValue();
+
+    switch (step)
+    {
+    case Step::SpecifyStartPnt:
+    {
+        Application::instance().getStatusBar()->setTips(QCoreApplication::translate("SketchDrawLine",
+            "Specify the start point; you can directly input the coordinate values."));
+
+        if (_sketchInfo.pSketchSnapSys)
+        {
+            _sketchInfo.pSketchSnapSys->partiallyUpdate(Application::instance().getActiveDatabase());
+        }
+        _pSnapContext = std::make_shared<SketchLocateContext>(wydb::ElementId::kNull);
+    }
+    break;
+
+    case Step::SpecifyEndPnt:
+    {
+        Application::instance().getStatusBar()->setTips(QCoreApplication::translate("SketchDrawLine",
+            "Specify the end point; you can directly input the values."));
+
+        _pSnapContext = std::make_shared<SketchDrawLineContext>(
+            _pMakeSketchLine ? _pMakeSketchLine->getId() : wydb::ElementId::kNull, _startPnt);
+    }
+    break;
+
+    default:
+    {
+        Application::instance().getStatusBar()->setTips("");
+        assert(false);
+    }
+    break;
+    }
+}
+
+void SketchDrawCenterLineGuiCmd::onFrame(double time)
+{
+    this->tryShowPopupOnHover(time);
+}
+
+void SketchDrawCenterLineGuiCmd::onMouseMove(const MouseEvent& event)
+{
+    if (event.x != _hoverPopupState.lastMouseX ||
+        event.y != _hoverPopupState.lastMouseY) // moved
+    {
+        this->hidePopup();
+        _hoverPopupState.lastMouseX = event.x;
+        _hoverPopupState.lastMouseY = event.y;
+        _hoverPopupState.lastMouseMoveTime = event.time;
+    }
+
+    if (_step == Step::SpecifyStartPnt)
+    {
+        wy::Vector2 startPnt = this->computePosition2d(event.x, event.y, _sketchInfo.sketchPlane, this->getSnapExcludeIds(), _pSnapContext, _sketchInfo.pSketchSnapSys);
+        _hoverPopupState.point = startPnt;
+    }
+    else if (_step == Step::SpecifyEndPnt)
+    {
+        wy::Vector2 endPnt = this->computePosition2d(event.x, event.y, _sketchInfo.sketchPlane, this->getSnapExcludeIds(), _pSnapContext, _sketchInfo.pSketchSnapSys);
+        auto lengthAngle = MathUtils::computeLengthAngle(_startPnt, endPnt);
+        _hoverPopupState.point = endPnt;
+        _hoverPopupState.length = lengthAngle.first;
+        _hoverPopupState.angleDeg = wy3d::radiansToDegrees(lengthAngle.second);
+        {
+            if (_pMakeSketchLine)
+            {
+                _pMakeSketchLine->update(endPnt);
+            }
+        }
+    }
+
+    return;
+}
+
+void SketchDrawCenterLineGuiCmd::onLeftMouseDown(const MouseEvent& event)
+{
+    this->hidePopup();
+    _hoverPopupState.lastMouseX = event.x;
+    _hoverPopupState.lastMouseY = event.y;
+    _hoverPopupState.lastMouseMoveTime = event.time;
+
+
+    if (_step == Step::SpecifyStartPnt)
+    {
+        _startPnt = this->computePosition2d(event.x, event.y, _sketchInfo.sketchPlane, this->getSnapExcludeIds(), _pSnapContext, _sketchInfo.pSketchSnapSys);
+        if (this->finishStep(_step))
+        {
+            this->simulateMouseMoveFromPopup();
+        }
+    }
+    else if (_step == Step::SpecifyEndPnt)
+    {
+        _endPnt = this->computePosition2d(event.x, event.y, _sketchInfo.sketchPlane, this->getSnapExcludeIds(), _pSnapContext, _sketchInfo.pSketchSnapSys);
+        if (this->finishStep(_step))
+        {
+            this->simulateMouseMoveFromPopup();
+        }
+    }
+    else
+    {
+        assert(false);
+    }
+
+    return;
+}
+
+void SketchDrawCenterLineGuiCmd::initializePopups()
+{
+    MainWindow* pMainWindow = Application::instance().getMainWindow();
+    if (!_pXYPopup)
+    {
+        _pXYPopup = std::make_unique<GuiCmdHoverInputPopup2>(
+            QStringLiteral("X"),
+            QStringLiteral("Y"),
+            QStringLiteral("-1234.56"),
+            pMainWindow);
+        _pXYPopup->setAcceptHandler([this]() { this->onPopupEnterKey(); });
+        _pXYPopup->setCancelHandler([this]() { this->onPopupEscapeKey(); });
+        _pXYPopup->hide();
+    }
+    if (!_pLengthAnglePopup)
+    {
+        _pLengthAnglePopup = std::make_unique<GuiCmdHoverInputPopup2>(
+            QCoreApplication::translate("SketchDrawLine", "Length"),
+            QCoreApplication::translate("SketchDrawLine", "Angle"),
+            QStringLiteral("-1234.56"),
+            pMainWindow);
+        _pLengthAnglePopup->setAcceptHandler([this]() { this->onPopupEnterKey(); });
+        _pLengthAnglePopup->setCancelHandler([this]() { this->onPopupEscapeKey(); });
+        _pLengthAnglePopup->hide();
+    }
+}
+
+void SketchDrawCenterLineGuiCmd::showPopup()
+{
+    if (!_pXYPopup || !_pLengthAnglePopup)
+    {
+        this->initializePopups();
+    }
+
+    GuiCmdHoverInputPopup2* pActivePopup = this->getActivePopup();
+    if (!pActivePopup)
+    {
+        return;
+    }
+
+    if (_step == Step::SpecifyStartPnt)
+    {
+        pActivePopup->setValues(
+            _hoverPopupState.point.x(),
+            _hoverPopupState.point.y());
+    }
+    else if (_step == Step::SpecifyEndPnt)
+    {
+        pActivePopup->setValues(
+            _hoverPopupState.length,
+            _hoverPopupState.angleDeg);
+    }
+    else
+    {
+        return;
+    }
+    pActivePopup->showAtGlobal(QCursor::pos());
+}
+
+void SketchDrawCenterLineGuiCmd::hidePopup()
+{
+    if (_pXYPopup && _pXYPopup->isVisible())
+    {
+        _pXYPopup->hide();
+    }
+    if (_pLengthAnglePopup && _pLengthAnglePopup->isVisible())
+    {
+        _pLengthAnglePopup->hide();
+    }
+}
+
+GuiCmdHoverInputPopup2* SketchDrawCenterLineGuiCmd::getActivePopup() const
+{
+    if (_step == Step::SpecifyStartPnt)
+    {
+        return _pXYPopup.get();
+    }
+    if (_step == Step::SpecifyEndPnt)
+    {
+        return _pLengthAnglePopup.get();
+    }
+    else
+    {
+        return nullptr;
+    }
+}
+
+void SketchDrawCenterLineGuiCmd::tryShowPopupOnHover(double time)
+{
+    if (_step != Step::SpecifyStartPnt && _step != Step::SpecifyEndPnt)
+    {
+        return;
+    }
+    if (_hoverPopupState.lastMouseMoveTime < 0.0)
+    {
+        return;
+    }
+    if ((_pXYPopup && _pXYPopup->isVisible()) ||
+        (_pLengthAnglePopup && _pLengthAnglePopup->isVisible()))
+    {
+        return;
+    }
+    if (time - _hoverPopupState.lastMouseMoveTime >= 0.45)
+    {
+        this->showPopup();
+    }
+}
+
+void SketchDrawCenterLineGuiCmd::onPopupEnterKey()
+{
+    GuiCmdHoverInputPopup2* pActivePopup = this->getActivePopup();
+    if (!pActivePopup)
+    {
+        return;
+    }
+
+    if (_step == Step::SpecifyStartPnt)
+    {
+        double x(0.0);
+        double y(0.0);
+        if (!parseDoubleText(pActivePopup->getRow1Text(), x) ||
+            !parseDoubleText(pActivePopup->getRow2Text(), y))
+        {
+            return;
+        }
+        _startPnt.set(x, y);
+    }
+    else if (_step == Step::SpecifyEndPnt)
+    {
+        double length(0.0);
+        if (!parseDoubleText(pActivePopup->getRow1Text(), length))
+        {
+            return;
+        }
+
+        QString angleText = pActivePopup->getRow2Text().trimmed();
+        double angleDeg(_hoverPopupState.angleDeg);
+        if (!angleText.isEmpty() && !parseDoubleText(angleText, angleDeg))
+        {
+            return;
+        }
+        double angle = wy3d::degreesToRadians(angleDeg);
+        _endPnt = _startPnt + length * wy::Vector2(std::cos(angle), std::sin(angle));
+    }
+    else
+    {
+        return;
+    }
+
+    if (this->finishStep(_step))
+    {
+        this->simulateMouseMoveFromPopup();
+    }
+}
+
+void SketchDrawCenterLineGuiCmd::onPopupEscapeKey()
+{
+    this->onEscapeKey();
+}
+
+void SketchDrawCenterLineGuiCmd::simulateMouseMoveFromPopup()
+{
+    if (_hoverPopupState.lastMouseX == DBL_MAX || _hoverPopupState.lastMouseY == DBL_MAX)
+        return;
+    this->onMouseMove({static_cast<float>(_hoverPopupState.lastMouseX),
+                       static_cast<float>(_hoverPopupState.lastMouseY),
+                       _hoverPopupState.lastMouseMoveTime});
+}
+
+std::set<wydb::ElementId> SketchDrawCenterLineGuiCmd::getSnapExcludeIds() const
+{
+    std::set<wydb::ElementId> snapExcludeIds;
+    snapExcludeIds.insert(_sketchInfo.sketchId);
+    if (_pMakeSketchLine) _pMakeSketchLine->collectElements(snapExcludeIds);
+    return snapExcludeIds;
+}
+
+void MakeSketchCenterLine::collectElements(std::set<wydb::ElementId>& idSet) const
+{
+    if (_pSketchLine) idSet.insert(_pSketchLine->getId());
+}
+
+bool MakeSketchCenterLine::init(const wy::Vector2& startPnt, wydb::ElementId sketchId)
+{
+    if (!_pDb || !_pTopTrans || _pSketchLine || _isFinished)
+    {
+        return false;
+    }
+
+    // 创建SketchLine
+    wydb::TransactionOption option;
+    option.chainUpdateScope = wydb::ChainUpdateScope::Local;
+    wydb::Transaction* pTrans = _pDb->getTransactionManager()->startTransaction("", option);
+    if (!pTrans) return false;
+    wy3d::Sketch* pSketch = nullptr;
+    wy3d::SketchCenterLine* pSketchLine = nullptr;
+    wy::Vector2 endPnt;
+    wydb::Element* pSketchElem = pTrans->getElementForWrite(sketchId);
+    if (!pSketchElem) goto ABORT_TRANS;
+    pSketch = wy3d::Sketch::cast(pSketchElem);
+    if (!pSketch) goto ABORT_TRANS;
+
+    endPnt = startPnt + wy::Vector2(wy3d::kMinValue, 0.0);
+    if (wy::ErrorStatus::Ok != wy3d::SketchCenterLine::create(pTrans, startPnt, endPnt, pSketchLine) || !pSketchLine)
+    {
+        goto ABORT_TRANS;
+    }
+    _pSketchLine = pSketchLine;
+    if (wy::ErrorStatus::Ok != pSketch->addEntity(pSketchLine))
+    {
+        goto ABORT_TRANS;
+    }
+    _pDb->getTransactionManager()->endTransaction();
+    _pSketchLine = pSketchLine;
+    return true;
+
+ABORT_TRANS:
+    assert(false);
+    _pDb->getTransactionManager()->abortTransaction();
+    if (_pSketchLine)
+    {
+        wydb::deleteElement(_pSketchLine);
+    }
+    _pSketchLine = nullptr;
+    return false;
+}
+
+bool MakeSketchCenterLine::update(const wy::Vector2& endPnt)
+{
+    if (!_pDb || !_pTopTrans || !_pSketchLine || _isFinished)
+    {
+        return false;
+    }
+    if ((endPnt - _pSketchLine->getStartPoint()).length() < wy3d::kMinValue)
+    {
+        return false;
+    }
+
+    wydb::TransactionOption option;
+    option.chainUpdateScope = wydb::ChainUpdateScope::Local;
+    wydb::Transaction* pTrans = _pDb->getTransactionManager()->startTransaction("", option);
+    if (!pTrans) return false;
+    {
+        _pSketchLine->upgradeForWrite();
+        _pSketchLine->setEndPoint(endPnt);
+    }
+    if (wy::ErrorStatus::Ok == _pDb->getTransactionManager()->endTransaction())
+    {
+        wydb::TransactionManager* pTransMgr = _pDb->getTransactionManager();
+        pTransMgr->mergeTransaction();
+    }
+    return true;
+}

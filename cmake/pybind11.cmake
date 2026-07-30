@@ -1,0 +1,6 @@
+CPMAddPackage(
+    NAME pybind11
+    SOURCE_DIR ${CMAKE_SOURCE_DIR}/3rdParty/pybind11
+    SYSTEM YES
+    OPTIONS "PYBIND11_TEST OFF"
+)

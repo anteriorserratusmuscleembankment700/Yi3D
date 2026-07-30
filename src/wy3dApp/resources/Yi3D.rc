@@ -1,0 +1,5 @@
+#ifdef RC_INVOKED
+1 ICON "Yi3D.ico"
+#else
+#  include <windows.h>
+#endif

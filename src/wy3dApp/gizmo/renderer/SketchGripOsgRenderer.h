@@ -1,0 +1,58 @@
+///////////////////////////////////////////////////////////////////////////////
+//
+// Copyright (C) 2024-2026 Wang Yao <wangyao1052@163.com>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+///////////////////////////////////////////////////////////////////////////////
+
+#ifndef WY3DAPP_SKETCH_GRIP_OSG_RENDERER_H
+#define WY3DAPP_SKETCH_GRIP_OSG_RENDERER_H
+
+#include <osg/Geometry>
+#include <osg/AutoTransform>
+
+#include "OsgGizmoRenderer.h"
+
+// SketchEntityGripGizmo 的 OSG 渲染器
+// 负责：抓取点几何创建、高亮、位置更新
+// 拖拽时的位置更新通过 DB 变更 → refresh() 路径，因此 drag 生命周期为空
+class SketchGripOsgRenderer : public OsgGizmoRenderer
+{
+public:
+    explicit SketchGripOsgRenderer(BaseGizmo* pGizmo);
+    virtual ~SketchGripOsgRenderer();
+
+    // ── GizmoRenderer ──
+    virtual void refresh() override;
+    virtual bool onBeginDrag(const wy::Vector3& startPos) override { return true; }
+    virtual bool onDragging(const wy::Vector3& curPos) override { return true; }
+    virtual void onEndDrag(const wy::Vector3& endPos) override {}
+    virtual void onCancelDrag() override {}
+
+    // ── 静态视觉 ──
+    void setPosition(const wy::Vector3& pos);
+
+    // ── Gizmo 激活/去激活 ──
+    virtual void onActivate() override;
+    virtual void onDeactivate() override;
+
+private:
+    osg::ref_ptr<osg::Geometry> generateGeometry();
+
+private:
+    osg::ref_ptr<osg::Geometry> _geom;
+    osg::ref_ptr<osg::AutoTransform> _at;
+};
+
+#endif // WY3DAPP_SKETCH_GRIP_OSG_RENDERER_H

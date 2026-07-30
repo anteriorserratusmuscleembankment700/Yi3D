@@ -1,0 +1,17 @@
+<svg width="64.000000" height="64.000000" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+	<desc>
+			Created with Pixso.
+	</desc>
+	<defs>
+		<clipPath id="clip6_36">
+			<rect id="DatumPlane_Tangent" width="64.000000" height="64.000000" fill="white" fill-opacity="0"/>
+		</clipPath>
+	</defs>
+	<rect id="DatumPlane_Tangent" width="64.000000" height="64.000000" fill="#FFFFFF" fill-opacity="0"/>
+	<g clip-path="url(#clip6_36)">
+		<path id="矩形 2" d="M14 24.83L52 9L52 47L14 62.83L14 24.83Z" fill="#C4C4C4" fill-opacity="0" fill-rule="evenodd"/>
+		<path id="矩形 2" d="M48 10.66L14 24.83L14 62.83L18 61.16L52 47L52 9L48 10.66ZM48 15L48 44.33L18 56.83L18 27.5L48 15Z" fill="#1296DB" fill-opacity="1.000000" fill-rule="evenodd"/>
+		<ellipse id="椭圆 6" cx="26.500000" cy="11.500000" rx="14.500000" ry="10.500000" fill="#C4C4C4" fill-opacity="0"/>
+		<ellipse id="椭圆 6" cx="26.500000" cy="11.500000" rx="13.000000" ry="9.000000" stroke="#495057" stroke-opacity="1.000000" stroke-width="3.000000"/>
+	</g>
+</svg>

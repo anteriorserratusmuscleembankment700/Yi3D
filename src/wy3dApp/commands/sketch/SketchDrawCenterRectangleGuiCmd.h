@@ -1,0 +1,127 @@
+///////////////////////////////////////////////////////////////////////////////
+//
+// Copyright (C) 2024-2026 Wang Yao <wangyao1052@163.com>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+///////////////////////////////////////////////////////////////////////////////
+
+#ifndef WY3DAPP_SKETCH_DRAW_CENTER_RECTANGLE_GUI_CMD_H
+#define WY3DAPP_SKETCH_DRAW_CENTER_RECTANGLE_GUI_CMD_H
+
+#include "commands/OsgGuiCommand.h"
+#include <cfloat>
+#include <memory>
+#include <set>
+#include <wyVector2.h>
+#include <wy3dVector2.h>
+#include <wydbElementId.h>
+#include <wy3dSketchLine.h>
+#include "SketchDrawRectangleGuiCmd.h"
+#include "commands/transient/BasicTransient.h"
+
+class MakeSketchRectangle;
+class GuiCmdHoverInputPopup2;
+
+class SketchDrawCenterRectangleGuiCmd : public OsgGuiCommand
+{
+    WYRX_DECLARE_MEMBERS(SketchDrawCenterRectangleGuiCmd, SketchDrawCenterRectangleGuiCmd, OsgGuiCommand)
+public:
+    SketchDrawCenterRectangleGuiCmd();
+    virtual ~SketchDrawCenterRectangleGuiCmd();
+
+protected:
+    GuiCmdSketchInfo _sketchInfo;
+    virtual wyap::CmdExecution::StartResult onStart() override;
+
+protected:
+    enum class Step
+    {
+        Undefined = 0,
+        SpecifyStartPnt = 1,
+        SpecifyEndPnt = 2,
+    };
+    virtual void cleanup() override;
+    virtual void reset();
+    virtual void onEscapeKey() override;
+    bool finishStep(Step step);
+    void gotoStep(Step step);
+
+    virtual void onMouseMove(const MouseEvent& event) override;
+    virtual void onLeftMouseDown(const MouseEvent& event) override;
+    void onFrame(double time) override;
+
+private:
+    std::set<wydb::ElementId> getSnapExcludeIds() const;
+    void initializePopups();
+    void showPopup();
+    void hidePopup();
+    GuiCmdHoverInputPopup2* getActivePopup() const;
+    void tryShowPopupOnHover(double time);
+    void onPopupEnterKey();
+    void onPopupEscapeKey();
+    void simulateMouseMoveFromPopup();
+
+    void updateDiagonalTransients(const wy::Vector2& startPnt, const wy::Vector2& endPnt);
+
+private:
+    struct HoverPopupState
+    {
+        // 鼠标信息
+        double lastMouseX;
+        double lastMouseY;
+        double lastMouseMoveTime;
+
+        // 数值信息
+        wy::Vector2 point;
+        double length;
+        double width;
+
+        HoverPopupState() :
+            lastMouseX(DBL_MAX),
+            lastMouseY(DBL_MAX),
+            lastMouseMoveTime(-1.0),
+            point(),
+            length(0.0),
+            width(0.0)
+        {
+            this->resetValue();
+        }
+
+        void resetValue()
+        {
+            point.set(0.0, 0.0);
+            length = 0.0;
+            width = 0.0;
+        }
+    };
+
+private:
+    Step _step;
+    wy::Vector2 _startPnt;
+    wy::Vector2 _endPnt;
+    SketchSnapContextSPtr _pSnapContext;
+
+    // 悬停浮窗
+    std::unique_ptr<GuiCmdHoverInputPopup2> _pXYPopup;
+    std::unique_ptr<GuiCmdHoverInputPopup2> _pLengthWidthPopup;
+    HoverPopupState _hoverPopupState;
+
+    LineTransientSPtr _pDiagonal1st;
+    LineTransientSPtr _pDiagonal2nd;
+
+    std::shared_ptr<MakeSketchRectangle> _pMakeSketchRectangle;
+};
+
+#endif // WY3DAPP_SKETCH_DRAW_CENTER_RECTANGLE_GUI_CMD_H
+

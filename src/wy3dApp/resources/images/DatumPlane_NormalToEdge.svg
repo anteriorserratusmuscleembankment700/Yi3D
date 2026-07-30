@@ -1,0 +1,16 @@
+<svg width="64.000000" height="64.000000" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+	<desc>
+			Created with Pixso.
+	</desc>
+	<defs>
+		<clipPath id="clip6_26">
+			<rect id="DatumPlane_NormalToEdge" width="64.000000" height="64.000000" fill="white" fill-opacity="0"/>
+		</clipPath>
+	</defs>
+	<rect id="DatumPlane_NormalToEdge" width="64.000000" height="64.000000" fill="#FFFFFF" fill-opacity="0"/>
+	<g clip-path="url(#clip6_26)">
+		<path id="矩形 2" d="M11 19.5L53 2L53 44L11 61.5L11 19.5Z" fill="#C4C4C4" fill-opacity="0" fill-rule="evenodd"/>
+		<path id="矩形 2" d="M49 3.66L11 19.5L11 61.5L15 59.83L53 44L53 2L49 3.66ZM49 8L49 41.33L15 55.5L15 22.16L49 8Z" fill="#1296DB" fill-opacity="1.000000" fill-rule="evenodd"/>
+		<line id="直线 11" x1="11.000000" y1="20.000000" x2="38.000000" y2="29.000000" stroke="#495057" stroke-opacity="1.000000" stroke-width="4.000000"/>
+	</g>
+</svg>

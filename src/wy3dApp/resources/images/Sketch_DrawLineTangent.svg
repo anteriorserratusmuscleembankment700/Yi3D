@@ -1,0 +1,12 @@
+<svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="64" height="64" fill="none">
+	<rect id="Sketch_DrawLineTangent" width="64" height="64" x="0" y="0" fill="rgb(255,255,255)" fill-opacity="0" />
+	<line id="直线 1" x1="0" x2="59.9999771" y1="0" y2="0" stroke="rgb(18,150,219)" stroke-width="4" transform="matrix(0.707107,-0.707107,0.707107,0.707107,10,55)" />
+	<circle id="椭圆 7" cx="65" cy="30" r="20" fill="rgb(196,196,196)" fill-opacity="0" />
+	<circle id="椭圆 7" cx="65" cy="30" r="19.25" stroke="rgb(75,75,75)" stroke-opacity="0.701149464" stroke-width="1.5" />
+	<circle id="椭圆 8" cx="-1" cy="36" r="20" fill="rgb(196,196,196)" fill-opacity="0" />
+	<circle id="椭圆 8" cx="-1" cy="36" r="19.25" stroke="rgb(75,75,75)" stroke-opacity="0.701149464" stroke-width="1.5" />
+	<circle id="椭圆 2" cx="54" cy="10" r="7" fill="rgb(73,80,87)" />
+	<circle id="椭圆 2" cx="54" cy="10" r="6.5" stroke="rgb(75,75,75)" stroke-opacity="0" stroke-width="1" />
+	<circle id="椭圆 3" cx="10" cy="54" r="7" fill="rgb(73,80,87)" />
+	<circle id="椭圆 3" cx="10" cy="54" r="6.5" stroke="rgb(75,75,75)" stroke-opacity="0" stroke-width="1" />
+</svg>

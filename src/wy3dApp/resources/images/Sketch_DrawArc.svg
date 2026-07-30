@@ -1,0 +1,20 @@
+<svg width="64.000000" height="64.000000" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+	<desc>
+			Created with Pixso.
+	</desc>
+	<defs>
+		<clipPath id="clip3_21">
+			<rect id="Sketch_DrawArc" width="64.000000" height="64.000000" fill="white" fill-opacity="0"/>
+		</clipPath>
+	</defs>
+	<g clip-path="url(#clip3_21)">
+		<path id="path2" d="M14.52 11.13L14.5 11.15C13.38 11.12 12.52 10.22 12.55 9.1C12.57 7.98 13.47 7.13 14.59 7.15L14.61 7.17L14.52 11.13ZM55.55 50.09L55.57 50.11C55.57 51.23 54.69 52.11 53.57 52.1C52.45 52.1 51.57 51.22 51.57 50.1L51.59 50.08L55.55 50.09Z" fill="#1296DB" fill-opacity="0" fill-rule="nonzero"/>
+		<path id="path2" d="M14.54 9.15C17.13 9.21 19.69 9.53 22.22 10.1C24.74 10.67 27.19 11.49 29.57 12.54C31.94 13.6 34.19 14.88 36.32 16.38C38.45 17.89 40.41 19.59 42.22 21.48C44.03 23.38 45.64 25.43 47.05 27.65C48.47 29.86 49.66 32.2 50.64 34.65C51.61 37.11 52.34 39.63 52.84 42.23C53.33 44.83 53.57 47.46 53.57 50.1" stroke="#1296DB" stroke-opacity="1.000000" stroke-width="4.000000" stroke-linejoin="round" stroke-linecap="round"/>
+		<circle id="椭圆 2" cx="14.052612" cy="50.552582" r="7.000000" fill="#495057" fill-opacity="1.000000"/>
+		<circle id="椭圆 2" cx="14.052612" cy="50.552582" r="6.500000" stroke="#4B4B4B" stroke-opacity="0" stroke-width="1.000000"/>
+		<circle id="椭圆 2" cx="14.052612" cy="8.552582" r="7.000000" fill="#495057" fill-opacity="1.000000"/>
+		<circle id="椭圆 2" cx="14.052612" cy="8.552582" r="6.500000" stroke="#4B4B4B" stroke-opacity="0" stroke-width="1.000000"/>
+		<circle id="椭圆 2" cx="54.052612" cy="50.552582" r="7.000000" fill="#495057" fill-opacity="1.000000"/>
+		<circle id="椭圆 2" cx="54.052612" cy="50.552582" r="6.500000" stroke="#4B4B4B" stroke-opacity="0" stroke-width="1.000000"/>
+	</g>
+</svg>
